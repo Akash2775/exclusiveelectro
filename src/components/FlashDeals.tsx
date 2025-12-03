@@ -1,47 +1,10 @@
 import { useState, useEffect } from "react";
-import { Clock, Flame } from "lucide-react";
+import { Clock, Flame, Loader2 } from "lucide-react";
 import ProductCard from "./ProductCard";
-
-const dealProducts = [
-  {
-    id: 101,
-    name: "AirPods Pro 2nd Gen",
-    price: 199,
-    originalPrice: 279,
-    image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 4521,
-  },
-  {
-    id: 102,
-    name: "Razer DeathAdder V3 Pro",
-    price: 89,
-    originalPrice: 149,
-    image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&h=400&fit=crop",
-    rating: 4.7,
-    reviews: 2341,
-  },
-  {
-    id: 103,
-    name: "Samsung 980 Pro 2TB SSD",
-    price: 149,
-    originalPrice: 249,
-    image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 1876,
-  },
-  {
-    id: 104,
-    name: "Logitech MX Keys Mini",
-    price: 79,
-    originalPrice: 119,
-    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&h=400&fit=crop",
-    rating: 4.6,
-    reviews: 987,
-  },
-];
+import { useFlashDeals } from "@/hooks/useProducts";
 
 const FlashDeals = () => {
+  const { data: dealProducts, isLoading } = useFlashDeals();
   const [timeLeft, setTimeLeft] = useState({
     hours: 23,
     minutes: 59,
@@ -76,6 +39,10 @@ const FlashDeals = () => {
     </div>
   );
 
+  if (!isLoading && (!dealProducts || dealProducts.length === 0)) {
+    return null;
+  }
+
   return (
     <section id="deals" className="py-20 relative overflow-hidden">
       {/* Background */}
@@ -109,17 +76,32 @@ const FlashDeals = () => {
         </div>
 
         {/* Products */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {dealProducts.map((product, index) => (
-            <div
-              key={product.id}
-              className="opacity-0 animate-slide-up"
-              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
-            >
-              <ProductCard {...product} badge="Flash Deal" />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {dealProducts?.map((product, index) => (
+              <div
+                key={product.id}
+                className="opacity-0 animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+              >
+                <ProductCard
+                  id={product.id}
+                  name={product.name}
+                  price={Number(product.price)}
+                  originalPrice={product.original_price ? Number(product.original_price) : undefined}
+                  image={product.image_url || "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop"}
+                  rating={Number(product.rating) || 0}
+                  reviews={product.reviews_count || 0}
+                  badge="Flash Deal"
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

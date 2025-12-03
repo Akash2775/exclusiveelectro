@@ -1,85 +1,11 @@
 import ProductCard from "./ProductCard";
 import { Button } from "@/components/ui/button";
-
-const products = [
-  {
-    id: 1,
-    name: "Apple MacBook Pro 16\" M3 Max",
-    price: 2499,
-    originalPrice: 2999,
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 2341,
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Sony WH-1000XM5 Wireless Headphones",
-    price: 349,
-    originalPrice: 399,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 1892,
-    badge: "Hot",
-  },
-  {
-    id: 3,
-    name: "Samsung Galaxy S24 Ultra 512GB",
-    price: 1199,
-    originalPrice: 1399,
-    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=400&fit=crop",
-    rating: 4.7,
-    reviews: 3421,
-  },
-  {
-    id: 4,
-    name: "PS5 Digital Edition Console",
-    price: 449,
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 5621,
-    badge: "Popular",
-  },
-  {
-    id: 5,
-    name: "Apple Watch Ultra 2 GPS + Cellular",
-    price: 799,
-    originalPrice: 899,
-    image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&h=400&fit=crop",
-    rating: 4.6,
-    reviews: 1234,
-  },
-  {
-    id: 6,
-    name: "DJI Mavic 3 Pro Drone",
-    price: 2199,
-    originalPrice: 2499,
-    image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&h=400&fit=crop",
-    rating: 4.8,
-    reviews: 876,
-    badge: "New",
-  },
-  {
-    id: 7,
-    name: "NVIDIA RTX 4090 Graphics Card",
-    price: 1599,
-    image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=400&h=400&fit=crop",
-    rating: 4.9,
-    reviews: 2145,
-  },
-  {
-    id: 8,
-    name: "LG C3 65\" OLED 4K Smart TV",
-    price: 1799,
-    originalPrice: 2299,
-    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop",
-    rating: 4.7,
-    reviews: 1567,
-    badge: "Deal",
-  },
-];
+import { useFeaturedProducts } from "@/hooks/useProducts";
+import { Loader2 } from "lucide-react";
 
 const FeaturedProducts = () => {
+  const { data: products, isLoading } = useFeaturedProducts();
+
   return (
     <section id="products" className="py-20 relative">
       {/* Background Glow */}
@@ -101,17 +27,36 @@ const FeaturedProducts = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              className="opacity-0 animate-slide-up"
-              style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
-            >
-              <ProductCard {...product} />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : products && products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className="opacity-0 animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+              >
+                <ProductCard
+                  id={product.id}
+                  name={product.name}
+                  price={Number(product.price)}
+                  originalPrice={product.original_price ? Number(product.original_price) : undefined}
+                  image={product.image_url || "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=400&fit=crop"}
+                  rating={Number(product.rating) || 0}
+                  reviews={product.reviews_count || 0}
+                  badge={product.badge || undefined}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>No featured products available yet.</p>
+          </div>
+        )}
       </div>
     </section>
   );

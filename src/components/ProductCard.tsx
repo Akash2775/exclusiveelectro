@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   originalPrice?: number;
